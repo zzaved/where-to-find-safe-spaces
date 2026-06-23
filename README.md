@@ -83,35 +83,55 @@ A Home é o coração do app. Assim que carrega, ela obtém a posição do GPS, 
   <img src="docs/screenshots/02_home.png" width="280" alt="Tela inicial com grid de locais próximos" />
 </p>
 
-<p align="center"><b>Figura 2 — Tela inicial (grid de locais próximos, estilo Grindr)</b><br/>Fonte: o autor (2026)</p>
+<p align="center"><b>Figura 2 — Tela inicial: grid de locais próximos (estilo Grindr), com selos de segurança, distância e nota do Google</b><br/>Fonte: o autor (2026)</p>
+
+##### Buffer local e filtro que nunca fica vazio
+
+Dois cuidados de produto reforçam essa tela. O primeiro é um **buffer no próprio aparelho**: o último resultado de cada categoria é guardado localmente (`shared_preferences`), então ao reabrir o app os locais aparecem **na hora**, sem spinner, enquanto uma busca fresca roda em segundo plano (*stale-while-revalidate*). Esse buffer no cliente soma-se ao cache de 7 dias do backend — um acelera a rede, o outro elimina a espera ao reabrir.
+
+O segundo é evitar o beco sem saída de uma **tela vazia**. Como a *Nearby Search* do Google devolve apenas os ~20 locais mais próximos (sem paginação) e lugares "não seguros" são naturalmente raros, um filtro estrito pode legitimamente não casar com nada por perto. Em vez de mostrar nada, o app cai num **fallback**: exibe os locais mais próximos daquela categoria, com um aviso claro de que está mostrando os mais próximos — como na figura abaixo, em *Restaurantes + Não seguros*.
+
+<p align="center">
+  <img src="docs/screenshots/09_fallback.png" width="280" alt="Filtro Não seguros sem resultados exibindo o fallback com aviso" />
+</p>
+
+<p align="center"><b>Figura 3 — Fallback do filtro: ao não encontrar "não seguros" em Restaurantes, o app mostra os mais próximos da categoria com um aviso, em vez de uma tela vazia</b><br/>Fonte: o autor (2026)</p>
 
 #### Detalhe do local
 
-Ao tocar em um card, abre-se o perfil completo do estabelecimento. No topo, a foto e um cabeçalho recolhível; abaixo, o **anel do Safe Score**, o selo, o endereço, a nota do Google e a distância. Em seguida vem o card **Reputação na web**, com o resumo gerado pelo Claude a partir da busca na internet — no exemplo abaixo, o MASP recebe score 79 e é classificado como *Safe space*, com um texto que explica por que o local é considerado acolhedor. Mais abaixo aparecem os **sinais positivos e de atenção** (chips), as **fontes consultadas** (links clicáveis), os botões de ação (Mapa, Site, Compartilhar) e as **avaliações** do Google com link para a fonte original.
+Ao tocar em um card, abre-se o perfil completo do estabelecimento. No topo, a foto e um cabeçalho recolhível; abaixo, o **anel do Safe Score**, o selo, o endereço, a nota do Google e a distância. Em seguida vem o card **Reputação na web**, com o resumo gerado pelo Claude a partir da busca na internet — no exemplo à esquerda, a Escola Politécnica da USP recebe score 65 e é classificada como *Safe space*, com um texto que aponta tanto os pontos de acolhimento quanto as ressalvas. À direita, um exemplo de *Sinais mistos* (Sweden Restaurant, score 57), em que a IA não encontrou sinais fortes nem positivos nem negativos.
 
 <p align="center">
-  <img src="docs/screenshots/03_detail.png" width="280" alt="Tela de detalhe com Safe Score e reputação na web" />
+  <img src="docs/screenshots/03_detail.png" width="280" alt="Detalhe com Safe Score e reputação na web (Safe space)" />
   &nbsp;&nbsp;&nbsp;
-  <img src="docs/screenshots/03b_detail_signals.png" width="280" alt="Sinais positivos e reputação detalhada" />
+  <img src="docs/screenshots/03d_detail_neutral.png" width="280" alt="Detalhe de um local com sinais mistos" />
 </p>
 
-<p align="center"><b>Figura 3 — Tela de detalhe: Safe Score, reputação na web (Claude) e sinais positivos</b><br/>Fonte: o autor (2026)</p>
+<p align="center"><b>Figura 4 — Tela de detalhe: Safe Score e resumo de reputação na web (Claude). À esquerda um "Safe space"; à direita "Sinais mistos"</b><br/>Fonte: o autor (2026)</p>
+
+Rolando a tela, aparecem os **sinais positivos e de atenção** (chips coloridos) e as **fontes consultadas** — os links que o Claude usou na web, abríveis no navegador —, além dos botões de ação (Mapa, Site, Compartilhar) e das **avaliações** do Google com link para a fonte original.
+
+<p align="center">
+  <img src="docs/screenshots/03b_detail_signals.png" width="280" alt="Sinais positivos e de atenção" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/screenshots/03c_detail_sources.png" width="280" alt="Fontes consultadas na web" />
+</p>
+
+<p align="center"><b>Figura 5 — Detalhe (rolagem): sinais positivos e de atenção (chips) e as fontes consultadas na web pelo Claude</b><br/>Fonte: o autor (2026)</p>
 
 #### Favoritos, Histórico e Ajustes
 
 A tela de **Favoritos** lista, no mesmo formato de grid, os locais que o usuário salvou tocando no coração — esses favoritos ficam persistidos no Postgres, atrelados ao identificador do dispositivo. A tela de **Histórico** mostra as buscas feitas anteriormente (categoria, número de locais e data/hora), lidas da tabela `search_history`. A tela de **Ajustes** explica a metodologia de classificação (as faixas do Safe Score — *Safe* de 65 a 100, *Sinais mistos* de 41 a 64, *Não seguro* de 0 a 40), traz um botão para **testar a notificação local** e informações sobre o app.
 
 <p align="center">
-  <img src="docs/screenshots/04_favorites.png" width="260" alt="Tela de favoritos" />
+  <img src="docs/screenshots/04_favorites.png" width="240" alt="Tela de favoritos" />
   &nbsp;
-  <img src="docs/screenshots/05_history.png" width="260" alt="Tela de histórico de buscas" />
+  <img src="docs/screenshots/05_history.png" width="240" alt="Tela de histórico de buscas" />
   &nbsp;
-  <img src="docs/screenshots/06_settings.png" width="260" alt="Tela de ajustes" />
+  <img src="docs/screenshots/06_settings.png" width="240" alt="Tela de ajustes" />
 </p>
 
-<p align="center"><b>Figura 4 — Telas de Favoritos, Histórico de buscas e Ajustes</b><br/>Fonte: o autor (2026)</p>
-
-> 📸 *As imagens das Figuras 4 a 6 devem ser capturadas no app em execução (Favoritos, Histórico, Ajustes, notificação e share sheet). Basta salvar os arquivos em `docs/screenshots/` com os nomes referenciados acima (`04_favorites.png`, `05_history.png`, `06_settings.png`, `07_notification.png`, `08_share.png`) que eles passam a aparecer automaticamente neste README.*
+<p align="center"><b>Figura 6 — Telas de Favoritos, Histórico de buscas e Ajustes</b><br/>Fonte: o autor (2026)</p>
 
 ### 2.3. O hardware: GPS e localização
 
@@ -144,31 +164,29 @@ A persistência usa **Postgres**, com quatro tabelas e *Row Level Security* habi
 
 A tabela `places` funciona como um **cache com expiração de 7 dias**: na primeira busca de uma região, cada local é classificado (incluindo a chamada paga ao Claude para os mais próximos); nas buscas seguintes, enquanto a classificação estiver fresca, ela é reaproveitada. Isso atende ao requisito de banco de dados com uma justificativa concreta de uso: **reduzir custo de API e acelerar buscas repetidas** (na prática, a primeira busca de uma área leva ~20s e as seguintes caem para ~1,7s). O `device_id` permite que favoritos e histórico sejam pessoais sem exigir cadastro nem login — uma decisão de produto que reduz o atrito de um app cuja própria natureza é sensível à privacidade.
 
+Há ainda um **segundo nível de cache, no próprio aparelho**: o último resultado de cada categoria é guardado em `shared_preferences` (o JSON cru do backend) e exibido instantaneamente ao reabrir o app, antes mesmo de a rede responder — o padrão *stale-while-revalidate* descrito na Seção 2.2. Os dois caches têm papéis distintos e complementares: o do Postgres evita reprocessar a classificação (custo); o do dispositivo elimina a espera na reabertura (latência percebida).
+
 ### 2.6. O sistema de notificações
 
 As notificações são **locais** (`flutter_local_notifications`) e estão amarradas a uma situação real de uso, como pede o enunciado. Toda vez que uma busca de descoberta termina com resultados, o app dispara automaticamente uma notificação resumindo o que encontrou — por exemplo, *"Busca concluída — Encontramos 7 espaço(s) seguro(s) entre 12 locais perto de você"*. Há também uma notificação prevista para alertar quando um local por perto é sinalizado como possível espaço não seguro. A escolha por notificação local (e não push) é coerente com a arquitetura: o evento que interessa — *terminou a análise dos locais ao seu redor* — acontece no próprio dispositivo, logo após o uso do GPS, então não há motivo para envolver um servidor de push.
 
 O serviço (`lib/core/services/notification_service.dart`) cuida da inicialização, do pedido de permissão (o prompt do iOS aparece no onboarding) e da apresentação das notificações com banner, som e *badge*. Na tela de Ajustes há um botão **"Testar notificação local"**, útil tanto para o usuário quanto para a banca avaliar a feature isoladamente, sem depender de uma busca real.
 
-<p align="center">
-  <img src="docs/screenshots/07_notification.png" width="280" alt="Notificação local após a busca" />
-</p>
-
-<p align="center"><b>Figura 5 — Notificação local exibida após a conclusão de uma busca</b><br/>Fonte: o autor (2026)</p>
+<blockquote>
+📸 <b>Figura 7 pendente</b> — adicione um print do <b>banner de notificação</b> capturado no iPhone (toque em <i>Ajustes → "Testar notificação local"</i> e fotografe o banner) como <code>docs/screenshots/07_notification.png</code> que ele aparece aqui automaticamente.
+</blockquote>
 
 ### 2.7. O compartilhamento nativo
 
 O compartilhamento usa a **share sheet nativa** do iOS/Android, via `share_plus`. Na tela de detalhe, o botão de compartilhar monta um texto formatado sobre o local — nome, selo de segurança, Safe Score, endereço, o resumo da reputação na web e o link para o mapa — e o entrega ao mecanismo nativo de compartilhamento do sistema operacional. Com isso, o usuário pode recomendar um espaço acolhedor por WhatsApp, mensagens, e-mail ou qualquer app instalado. O recurso é coerente com a proposta: a informação de "este lugar é seguro" ganha valor quando pode ser passada adiante para quem se confia.
 
-<p align="center">
-  <img src="docs/screenshots/08_share.png" width="280" alt="Share sheet nativa do iOS com os dados do local" />
-</p>
-
-<p align="center"><b>Figura 6 — Compartilhamento via share sheet nativa do sistema</b><br/>Fonte: o autor (2026)</p>
+<blockquote>
+📸 <b>Figura 8 pendente</b> — adicione um print da <b>share sheet</b> capturado no iPhone (na tela de detalhe, toque no ícone de compartilhar) como <code>docs/screenshots/08_share.png</code> que ele aparece aqui automaticamente.
+</blockquote>
 
 ### 2.8. Tratamento de erros, carregamentos e estados vazios
 
-Cada tela trata explicitamente os três estados que um app que depende de rede e hardware precisa cobrir. Durante a busca, a Home mostra um *spinner* com a mensagem "Procurando locais perto de você…". Se a localização estiver desativada ou a permissão negada, em vez de uma tela em branco, aparece uma mensagem clara com um botão "Tentar novamente". Se um filtro não retorna nada, há um estado vazio orientando o usuário a trocar de categoria. Favoritos e Histórico têm seus próprios estados de carregamento, erro e vazio. No detalhe, enquanto a verificação aprofundada do Claude roda, um indicador discreto sinaliza que a reputação na web ainda está sendo apurada, sem travar o resto da tela — os dados do cache aparecem na hora e são enriquecidos quando a análise termina.
+Cada tela trata explicitamente os estados que um app que depende de rede e hardware precisa cobrir. Durante a primeira busca, a Home mostra um *spinner* com a mensagem "Procurando locais perto de você…"; nas reaberturas, o **buffer local** exibe o último resultado na hora, sem spinner, enquanto atualiza em segundo plano. Se a localização estiver desativada ou a permissão negada, em vez de uma tela em branco, aparece uma mensagem clara com um botão "Tentar novamente". Quando um filtro de segurança não casa com nada por perto, o app não mostra uma tela vazia: cai no **fallback** dos locais mais próximos da categoria, com um aviso (Figura 3). Favoritos e Histórico têm seus próprios estados de carregamento, erro e vazio. No detalhe, enquanto a verificação aprofundada do Claude roda, um indicador discreto sinaliza que a reputação na web ainda está sendo apurada, sem travar o resto da tela — os dados do cache aparecem na hora e são enriquecidos quando a análise termina.
 
 ---
 
