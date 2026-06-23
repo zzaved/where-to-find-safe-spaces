@@ -172,17 +172,9 @@ As notificações são **locais** (`flutter_local_notifications`) e estão amarr
 
 O serviço (`lib/core/services/notification_service.dart`) cuida da inicialização, do pedido de permissão (o prompt do iOS aparece no onboarding) e da apresentação das notificações com banner, som e *badge*. Na tela de Ajustes há um botão **"Testar notificação local"**, útil tanto para o usuário quanto para a banca avaliar a feature isoladamente, sem depender de uma busca real.
 
-<blockquote>
-📸 <b>Figura 7 pendente</b> — adicione um print do <b>banner de notificação</b> capturado no iPhone (toque em <i>Ajustes → "Testar notificação local"</i> e fotografe o banner) como <code>docs/screenshots/07_notification.png</code> que ele aparece aqui automaticamente.
-</blockquote>
-
 ### 2.7. O compartilhamento nativo
 
 O compartilhamento usa a **share sheet nativa** do iOS/Android, via `share_plus`. Na tela de detalhe, o botão de compartilhar monta um texto formatado sobre o local — nome, selo de segurança, Safe Score, endereço, o resumo da reputação na web e o link para o mapa — e o entrega ao mecanismo nativo de compartilhamento do sistema operacional. Com isso, o usuário pode recomendar um espaço acolhedor por WhatsApp, mensagens, e-mail ou qualquer app instalado. O recurso é coerente com a proposta: a informação de "este lugar é seguro" ganha valor quando pode ser passada adiante para quem se confia.
-
-<blockquote>
-📸 <b>Figura 8 pendente</b> — adicione um print da <b>share sheet</b> capturado no iPhone (na tela de detalhe, toque no ícone de compartilhar) como <code>docs/screenshots/08_share.png</code> que ele aparece aqui automaticamente.
-</blockquote>
 
 ### 2.8. Tratamento de erros, carregamentos e estados vazios
 
