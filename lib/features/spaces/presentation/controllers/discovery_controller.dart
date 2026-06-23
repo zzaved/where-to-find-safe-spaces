@@ -13,6 +13,13 @@ class DiscoveryController extends Notifier<DiscoveryState> {
   DiscoveryState build() => const DiscoveryState.initial();
 
   Future<void> discover({bool forceRefresh = false}) async {
+    // Stale-while-revalidate: render the device-cached result for this category
+    // instantly (no spinner), then refresh from the backend below.
+    if (state.spaces.isEmpty) {
+      final cached =
+          ref.read(spacesRepositoryProvider).cachedSpaces(state.category);
+      if (cached.isNotEmpty) state = state.copyWith(spaces: cached);
+    }
     state = state.copyWith(loading: true, clearError: true);
     try {
       final location = await ref.read(locationServiceProvider).getCurrentLocation();
@@ -34,10 +41,13 @@ class DiscoveryController extends Notifier<DiscoveryState> {
     }
   }
 
-  /// Changing category requires a fresh backend query.
+  /// Changing category requires a fresh backend query. Swap straight to that
+  /// category's cached buffer (possibly empty) so we never show the previous
+  /// category's cards while the new query runs.
   Future<void> setCategory(PlaceCategory category) async {
     if (category == state.category) return;
-    state = state.copyWith(category: category);
+    final cached = ref.read(spacesRepositoryProvider).cachedSpaces(category);
+    state = state.copyWith(category: category, spaces: cached);
     await discover();
   }
 

@@ -13,6 +13,10 @@ abstract interface class SpacesRepository {
     bool forceRefresh,
   });
 
+  /// Last discovery for [category] from the on-device buffer (empty if none).
+  /// Used to render instantly while a fresh result loads.
+  List<SafeSpace> cachedSpaces(PlaceCategory category);
+
   /// Full details for a single place, running a deep web check on demand.
   Future<SafeSpace> details({
     required String googlePlaceId,

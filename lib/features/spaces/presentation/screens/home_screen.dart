@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/usecases/discover_spaces.dart';
 import '../controllers/discovery_controller.dart';
 import '../controllers/discovery_state.dart';
 import '../controllers/favorites_controller.dart';
@@ -145,18 +146,18 @@ class _Body extends ConsumerWidget {
       );
     }
 
-    final spaces = state.visibleSpaces;
+    final spaces = state.displaySpaces;
     if (spaces.isEmpty) {
       return const _StatusMessage(
         icon: Icons.search_off_rounded,
-        title: 'Nenhum local neste filtro',
-        subtitle: 'Tente outra categoria ou remova o filtro de segurança.',
+        title: 'Nenhum local por perto',
+        subtitle: 'Tente outra categoria ou atualize a busca.',
       );
     }
 
     final favoriteIds = ref.watch(favoriteIdsProvider);
 
-    return RefreshIndicator(
+    final grid = RefreshIndicator(
       onRefresh: () =>
           ref.read(discoveryControllerProvider.notifier).discover(forceRefresh: true),
       child: GridView.builder(
@@ -183,6 +184,56 @@ class _Body extends ConsumerWidget {
                 ref.read(favoritesControllerProvider.notifier).toggle(space),
           );
         },
+      ),
+    );
+
+    if (!state.isFilterFallback) return grid;
+
+    return Column(
+      children: [
+        _FallbackBanner(filter: state.filter),
+        Expanded(child: grid),
+      ],
+    );
+  }
+}
+
+/// Shown when a Safe / Not-safe filter matched nothing nearby and the grid is
+/// falling back to the nearest places of the category.
+class _FallbackBanner extends StatelessWidget {
+  const _FallbackBanner({required this.filter});
+
+  final SafetyFilter filter;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = filter == SafetyFilter.safe
+        ? 'espaço marcado como seguro'
+        : 'espaço sinalizado como não seguro';
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded,
+              size: 18, color: AppColors.textSecondary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Nenhum $label por perto. Mostrando os locais mais próximos.',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12.5,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

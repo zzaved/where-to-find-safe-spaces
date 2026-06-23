@@ -2,15 +2,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/device_service.dart';
+import '../../domain/entities/safe_space.dart';
 import '../models/safe_space_model.dart';
+import 'discovery_cache.dart';
 
 /// Talks to Supabase: the `spaces` edge function for discovery/details and the
 /// `favorites` table for per-device persistence.
 class SpacesRemoteDataSource {
-  SpacesRemoteDataSource(this._client, this._deviceService);
+  SpacesRemoteDataSource(this._client, this._deviceService, this._cache);
 
   final SupabaseClient _client;
   final DeviceService _deviceService;
+  final DiscoveryCache _cache;
 
   Future<List<SafeSpaceModel>> discover({
     required double lat,
@@ -29,10 +32,14 @@ class SpacesRemoteDataSource {
       'deviceId': _deviceService.deviceId,
     });
     final places = (data['places'] as List?) ?? const [];
+    await _cache.save(category, places);
     return places
         .map((e) => SafeSpaceModel.fromJson(Map<String, dynamic>.from(e as Map)))
         .toList();
   }
+
+  /// Last discovery for [category] from the on-device buffer (empty if none).
+  List<SafeSpace> cachedDiscover(String category) => _cache.load(category);
 
   Future<SafeSpaceModel> details({
     required String googlePlaceId,

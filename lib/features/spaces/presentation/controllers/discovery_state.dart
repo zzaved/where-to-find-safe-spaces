@@ -34,9 +34,29 @@ class DiscoveryState extends Equatable {
   final UserLocation? location;
   final String? error;
 
+  /// How many nearest places to fall back to when a Safe / Not-safe filter
+  /// finds nothing nearby.
+  static const _fallbackLimit = 10;
+
   /// Spaces after applying the active Safe / Not-safe filter.
   List<SafeSpace> get visibleSpaces =>
       spaces.where(filter.matches).toList(growable: false);
+
+  /// What the grid actually shows. Google's Nearby Search returns only the ~20
+  /// nearest places (no pagination), and truly "unsafe" spots are rare — so a
+  /// strict filter can legitimately match nothing. Rather than a dead-end empty
+  /// screen, fall back to the nearest places of the current category.
+  List<SafeSpace> get displaySpaces {
+    if (filter == SafetyFilter.all) return spaces;
+    final strict = visibleSpaces;
+    if (strict.isNotEmpty) return strict;
+    return spaces.take(_fallbackLimit).toList(growable: false);
+  }
+
+  /// True when the strict filter matched nothing and [displaySpaces] is showing
+  /// the nearest-of-category fallback instead.
+  bool get isFilterFallback =>
+      filter != SafetyFilter.all && spaces.isNotEmpty && visibleSpaces.isEmpty;
 
   int get safeCount =>
       spaces.where((s) => s.safetyLabel == SafetyLabel.safe).length;

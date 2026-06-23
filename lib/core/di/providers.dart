@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../features/spaces/data/datasources/discovery_cache.dart';
 import '../../features/spaces/data/datasources/spaces_remote_datasource.dart';
 import '../../features/spaces/data/repositories/spaces_repository_impl.dart';
 import '../../features/spaces/domain/repositories/spaces_repository.dart';
@@ -37,10 +38,15 @@ final shareServiceProvider = Provider<ShareService>((_) => const ShareService())
 
 // --- Data -------------------------------------------------------------------
 
+final discoveryCacheProvider = Provider<DiscoveryCache>(
+  (ref) => DiscoveryCache(ref.watch(sharedPreferencesProvider)),
+);
+
 final spacesRemoteDataSourceProvider = Provider<SpacesRemoteDataSource>(
   (ref) => SpacesRemoteDataSource(
     ref.watch(supabaseClientProvider),
     ref.watch(deviceServiceProvider),
+    ref.watch(discoveryCacheProvider),
   ),
 );
 

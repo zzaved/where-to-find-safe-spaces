@@ -27,6 +27,10 @@ class SpacesRepositoryImpl implements SpacesRepository {
   }
 
   @override
+  List<SafeSpace> cachedSpaces(PlaceCategory category) =>
+      _remote.cachedDiscover(category.apiValue);
+
+  @override
   Future<SafeSpace> details({
     required String googlePlaceId,
     bool forceRefresh = false,
