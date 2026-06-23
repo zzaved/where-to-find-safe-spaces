@@ -4,10 +4,23 @@ Aplicativo móvel (Flutter / iOS) que ajuda pessoas **LGBTQIA+** a descobrir, **
 
 > **Atividade Ponderada 4** — aplicação mobile completa, com backend, banco de dados, consumo de API externa, sistema de notificações, compartilhamento nativo e uso de hardware do dispositivo.
 
+## 🎥 Demonstração em vídeo
+
+Vídeo demonstrando o problema, a solução, as etapas e as considerações finais:
+
+**▶️ [Assista no YouTube](https://youtu.be/bMZqsifAoLM)**
+
+<p align="center">
+  <a href="https://youtu.be/bMZqsifAoLM">
+    <img src="https://img.youtube.com/vi/bMZqsifAoLM/maxresdefault.jpg" width="520" alt="Demonstração em vídeo do Safe Spaces" />
+  </a>
+</p>
+
 ---
 
 ## Sumário
 
+- [🎥 Demonstração em vídeo](#-demonstração-em-vídeo)
 - [Introdução](#1-introdução)
 - [Desenvolvimento](#2-desenvolvimento)
   - [2.1. Visão geral e fluxo principal](#21-visão-geral-e-fluxo-principal)
